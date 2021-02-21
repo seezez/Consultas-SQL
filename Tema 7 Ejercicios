@@ -1,0 +1,61 @@
+/* 1. Sacar los departamentos cuyo salario medio sea superior al salario medio de la empresa.*/
+SELECT dept_no, AVG(salario) FROM emple GROUP BY dept_no HAVING  AVG(salario)>(SELECT AVG(salario) FROM emple);
+
+/* 2. Visualizar cada oficio con el salario máximo, mínimo y medio, dándole formato (cantidades con 2 decimales seguidos del símbolo de €).*/
+SELECT oficio AS OFICIO, concat(MAX(salario),' €') AS MAXIMO, concat(MIN(salario),' €') AS MINIMO, concat(round(AVG(salario),2),' €') AS MEDIO FROM emple GROUP BY oficio;
+
+/* 3.	Visualizar cuántos empleados hay de cada oficio en cada departamento.*/
+SELECT dept_no AS DEPARTAMENTO, oficio AS OFICIO,COUNT(emp_no) AS EMPLEADOS FROM emple GROUP BY dept_no, oficio;
+
+/* 4.	Nombres de departamentos que tengan más de 4 personas trabajando.*/
+SELECT dnombre AS DEPARTAMENTO, COUNT(emp_no) AS EMPLEADOS FROM depart JOIN emple ON depart.DEPT_NO = emple.DEPT_NO GROUP BY dnombre HAVING COUNT(emp_no) > 4;
+
+/* 5.	Seleccionar el oficio y el máximo salario de cada oficio.*/
+SELECT oficio AS OFICIO ,MAX(salario) AS MAXIMO FROM emple GROUP BY oficio;
+
+/* 6.	Considerando la consulta anterior, ¿y si queremos mostrar también el empleado que tiene ese salario máximo dentro de cada oficio?*/
+SELECT oficio AS OFICIO , apellido as APELLIDO, MAX(salario) AS MAXIMO FROM emple GROUP BY oficio;
+
+/* 7.	¿Cuántas personas tiene el departamento que más tiene? */
+SELECT COUNT(emp_no) AS EMPLEADOS FROM emple GROUP BY dept_no ORDER BY COUNT(emp_no) DESC LIMIT 1;
+
+/* 8.	¿Y qué departamento es (sacar el código de departamento y el nombre)? */
+SELECT emple.dept_no, dnombre, COUNT(emp_no) FROM depart JOIN emple ON depart.DEPT_NO = emple.DEPT_NO GROUP BY emple.dept_no ORDER BY COUNT(emp_no) DESC LIMIT 1;
+
+/* 9.	Visualiza el número de departamento, el nombre del departamento y número de empleados de todos los departamentos, incluso si no tiene empleados. */
+SELECT depart.dept_no, dnombre, COUNT(emp_no) FROM depart left join emple ON depart.DEPT_NO = emple.dept_no GROUP BY depart.DEPT_NO;
+
+/* 10. Departamentos con mayor número de empleados que sean EMPLEADO */
+SELECT dept_no, COUNT(emp_no) FROM emple WHERE oficio LIKE 'empleado' GROUP BY dept_no ORDER BY COUNT(emp_no) DESC;
+
+/* 11. Oficio que más empleados tiene (oficio y número de empleados). */
+SELECT oficio, COUNT(emp_no) FROM emple GROUP BY oficio ORDER BY COUNT(emp_no) DESC LIMIT 1;
+
+/* 12. Oficio con menor salario medio (oficio y salario medio). */
+SELECT oficio, avg(salario) FROM emple GROUP BY oficio ORDER BY avg(salario) LIMIT 1;
+
+/* 13. Cuántos empleados ganan entre 1000 y 1999, entre 2000 y 2999, ... */
+SELECT (select COUNT(emp_no) FROM emple WHERE salario BETWEEN 1000 AND 1999) AS '1000-1999', 
+		(select COUNT(emp_no) FROM emple WHERE salario BETWEEN 2000 AND 2999) AS '2000-2999',
+		(select COUNT(emp_no) FROM emple WHERE salario BETWEEN 3000 AND 3999) AS '3000-3999',
+		(select COUNT(emp_no) FROM emple WHERE salario BETWEEN 4000 AND 4999) AS '4000-4999';
+
+/* 14. Resumir los empleados (año, cuántos y salario medio) por año de fecha de alta en la empresa. */
+SELECT year(FECHA_ALT), COUNT(emp_no), AVG(salario) FROM emple GROUP BY year(FECHA_ALT);
+
+/* 22. Partiendo de la tabla EMPLE, visualiza por cada oficio de los empleados del departamento ‘VENTAS’ la suma de salarios.*/
+SELECT SUM(salario) FROM depart JOIN emple ON depart.DEPT_NO = emple.DEPT_NO WHERE dnombre LIKE 'ventas';
+
+/* 23. Selecciona aquellos apellidos de la tabla EMPLE cuyo salario sea mayor o igual a la media del salario en su departamento. */
+SELECT apellido FROM emple e WHERE salario >= (SELECT AVG(salario) FROM emple GROUP BY dept_no HAVING e.dept_no = dept_no);
+
+/* 24. A partir de la tabla EMPLE, visualiza el número de empleados de cada departamento cuyo oficio sea ‘EMPLEADO’. */
+SELECT dept_no, COUNT(emp_no) FROM emple WHERE oficio LIKE 'empleado' GROUP BY dept_no;
+
+/* 25. Desde la tabla EMPLE, visualiza el departamento que tenga más empleados cuyo oficio sea ‘EMPLEADO’.*/
+SELECT dept_no, COUNT(emp_no) FROM emple WHERE oficio LIKE 'empleado' GROUP BY dept_no ORDER BY COUNT(emp_no) DESC LIMIT 1;
+
+/* 26. A partir de las tablas EMPLE y DEPART, visualiza el número del departamento y el nombre del departamento que tenga más empleados cuyo oficio sea ‘empleado’.*/
+SELECT emple.dept_no, dnombre, COUNT(emp_no) FROM depart JOIN emple ON depart.DEPT_NO = emple.DEPT_NO WHERE oficio LIKE 'empleado' GROUP BY emple.DEPT_NO;
+
+/* 27. Busca los departamentos que tienen más de dos personas trabajando en la misma profesión.*/
